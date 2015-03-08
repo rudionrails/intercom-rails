@@ -1,20 +1,41 @@
-require 'intercom-rails/exceptions'
-require 'intercom-rails/date_helper'
-require 'intercom-rails/proxy'
-require 'intercom-rails/proxy/user'
-require 'intercom-rails/proxy/company'
-require 'intercom-rails/script_tag'
-require 'intercom-rails/script_tag_helper'
-require 'intercom-rails/custom_data_helper'
-require 'intercom-rails/auto_include_filter'
-require 'intercom-rails/config'
-require 'intercom-rails/import'
-require 'intercom-rails/railtie' if defined? Rails
+require 'intercom/rails/repository'
+require 'intercom/rails/configuration'
+require 'intercom/rails/proxy'
+require 'intercom/rails/script'
+require 'intercom/rails/helpers'
 
-module IntercomRails
+module Intercom
+  module Rails
 
-  def self.config
-    block_given? ? yield(Config) : Config
+    # Intercom::Rails.configure ApplicationController do
+    #   set :app_id, '123abc'
+    #   set :secret, '123abc-456def'
+    #
+    #   user.instance { |controller| controllercontext.current_user }
+    #   user.reject { |user| user.deleted? }
+    #   user.attributes do |user|
+    #     {
+    #       id: user.uuid,
+    #       name: user.name,
+    #       email: user.email
+    #     }
+    #   end
+    #
+    #   company.instance { |controller| controller.current_user.company }
+    #   company.reject { |company| company.deleted? }
+    #   company.attributes do |company|
+    #     {
+    #       id: company.uuid,
+    #       name: company.name,
+    #       email: company.email
+    #     }
+    #   end
+    # end
+    def self.configure( klass, &block )
+      Intercom::Rails::Repository[klass] = block
+      klass.send :include, Intercom::Rails::Helpers
+    end
+
   end
-
 end
+
