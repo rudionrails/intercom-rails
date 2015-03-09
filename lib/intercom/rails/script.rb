@@ -48,13 +48,12 @@ EOS
 
       def user_settings
         user = @intercom.user.to_h
-        user[:user_id] = user.delete(:id)
 
-        if secret = @intercom.settings[:secret]
-          data = (user[:id] || user[:user_id] || user[:email]).to_s
-          user[:user_hash] = OpenSSL::HMAC.hexdigest("sha256", secret, data)
+        if secret = @intercom.settings[:secret] and id = (user[:id] || user[:email])
+          user[:user_hash] = OpenSSL::HMAC.hexdigest("sha256", secret.to_s, id.to_s)
         end
 
+        user[:user_id] = user.delete(:id)
         sanitize(user)
       end
 
